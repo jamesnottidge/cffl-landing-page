@@ -1,6 +1,7 @@
 "use client";
+import { useEffect, useState } from "react";
+import { client } from "../../sanity/lib/client";
 
-import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/footer";
 import Image from "next/image";
@@ -20,6 +21,7 @@ const weekData = [
 export default function GamesPage() {
   const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
   const [activeDivision, setActiveDivision] = useState<"Men" | "Women">("Men");
+  const [matches, setMatches] = useState<any[]>([]);
 
   const handleWeekClick = (index: number) => setCurrentWeekIndex(index);
   const handleDivisionClick = (division: "Men" | "Women") =>
@@ -33,6 +35,25 @@ export default function GamesPage() {
   const segmentActiveStyle = "bg-[#012752] text-white shadow-inner";
   const segmentInactiveStyle =
     "bg-transparent text-white hover:bg-[#a80f0f]";
+
+  // Fetch matches from Sanity for the selected division
+  useEffect(() => {
+    const fetchMatches = async () => {
+      const data = await client.fetch(`
+        *[_type == "match" && division == "${activeDivision}"] | order(matchDay asc) {
+          _id,
+          matchDay,
+          date,
+          time,
+          team1 { name, logo { asset-> { url } } },
+          team2 { name, logo { asset-> { url } } }
+        }
+      `);
+      setMatches(data);
+    };
+
+    fetchMatches();
+  }, [activeDivision]);
 
   return (
     <>
@@ -54,7 +75,6 @@ export default function GamesPage() {
           {/* --- Week Scroller --- */}
           <section className="relative py-4 border-b border-gray-200 overflow-x-auto">
             <div className="flex items-center justify-between w-full select-none min-w-[320px]">
-              {/* Left Arrow */}
               <button
                 onClick={() => handleWeekClick(currentWeekIndex - 1)}
                 disabled={currentWeekIndex === 0}
@@ -67,7 +87,6 @@ export default function GamesPage() {
                 <ChevronLeft size={24} />
               </button>
 
-              {/* Weeks */}
               <div className="flex flex-wrap justify-center md:justify-between items-start flex-grow mx-2 sm:mx-4 gap-3 md:gap-0">
                 {weekData.map((weekItem, index) => {
                   const isCurrent = index === currentWeekIndex;
@@ -102,7 +121,6 @@ export default function GamesPage() {
                 })}
               </div>
 
-              {/* Right Arrow */}
               <button
                 onClick={() => handleWeekClick(currentWeekIndex + 1)}
                 disabled={currentWeekIndex === weekData.length - 1}
@@ -153,111 +171,93 @@ export default function GamesPage() {
               </div>
             </div>
 
-            {/* --- Men's Fixtures --- */}
+            {/* --- Fixtures List --- */}
             {activeDivision === "Men" && (
               <section className="w-full bg-[#F7F7F7] py-6 sm:py-12">
                 <div className="space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
-                  {["m2.png", "m2.png", "m2.png", "m2.png"].map(
-                    (img, i) => (
-                      <div
-                        key={i}
-                        className="bg-white rounded-lg shadow-lg overflow-hidden"
-                      >
-                        <div className="relative w-full mb-[5px]">
-                          <img
-                            src={`/${img}`}
-                            alt={`Men's Game ${i + 1}`}
-                            className="w-full h-auto object-contain rounded-t-lg"
-                          />
-                          <img
-                            src="/matchday2.png"
-                            alt="Overlay Graphic"
-                            className="absolute inset-0 w-full h-full object-contain opacity-80 pointer-events-none hidden sm:block"
-                          />
+                  {matches.map((match, i) => (
+                    <div
+                      key={match._id}
+                      className="bg-white rounded-lg shadow-lg overflow-hidden"
+                    >
+                      <div className="relative w-full mb-[5px]">
+                        {/* Keep background image unchanged */}
+                        <img
+                          src="/m2.png"
+                          alt={`Match Background ${i + 1}`}
+                          className="w-full h-auto object-contain rounded-t-lg"
+                        />
+                        <img
+                          src="/matchday2.png"
+                          alt="Overlay Graphic"
+                          className="absolute inset-0 w-full h-full object-contain opacity-80 pointer-events-none hidden sm:block"
+                        />
 
-                          <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 sm:px-4 z-10">
-                            <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0">
-                              <img
-                                src={
-                                  i === 0
-                                    ? "/team1.png"
-                                    : i === 1
-                                    ? "/team5.png"
-                                    : i === 2
-                                    ? "/team7.png"
-                                    : "/team9.png"
-                                }
-                                alt="Team 1"
-                                className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
-                              />
-                              <h2
-                                className="text-lg sm:text-3xl md:text-4xl font-extrabold text-white uppercase drop-shadow-lg"
-                                style={{
-                                  fontFamily:
-                                    "ITC Machine Std, sans-serif",
-                                }}
-                              >
-                                TEAM A <span className="text-white">vs</span>{" "}
-                                TEAM B
-                              </h2>
-                              <img
-                                src={
-                                  i === 0
-                                    ? "/team6.png"
-                                    : i === 1
-                                    ? "/team2.png"
-                                    : i === 2
-                                    ? "/team9.png"
-                                    : "/team5.png"
-                                }
-                                alt="Team 2"
-                                className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div
-                          className="flex flex-col sm:flex-row justify-between items-start sm:items-end p-3 gap-3 sm:gap-0"
-                          style={{
-                            fontFamily: "DM Sans, sans-serif",
-                            fontWeight: 700,
-                          }}
-                        >
-                          <div className="text-left text-xs text-gray-700 font-semibold">
-                            <p className="text-sm text-gray-900">
-                              MATCH DAY {i + 1}
-                            </p>
-                            <p>SAT, 25/09</p>
-                            <p>11:50 AM WAT</p>
-                          </div>
-
-                          <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                            <button
-                              className="flex items-center justify-center space-x-1 py-2 px-3 rounded-md text-white font-medium text-sm transition duration-300 w-full sm:w-auto"
+                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 sm:px-4 z-10">
+                          <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0">
+                            <img
+                              src={match.team1.logo.asset.url}
+                              alt={match.team1.name}
+                              className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
+                            />
+                            <h2
+                              className="text-lg sm:text-3xl md:text-4xl font-extrabold text-white uppercase drop-shadow-lg"
                               style={{
-                                backgroundColor: "#012752",
-                                border: "1px solid #012752",
+                                fontFamily: "ITC Machine Std, sans-serif",
                               }}
                             >
-                              <span>Get Ticket</span>
-                            </button>
-
-                            <button
-                              className="flex items-center justify-center space-x-1 py-2 px-3 rounded-md font-medium text-sm transition duration-300 w-full sm:w-auto"
-                              style={{
-                                backgroundColor: "white",
-                                color: "#012752",
-                                border: "1px solid #012752",
-                              }}
-                            >
-                              <span>Add to Calendar</span>
-                            </button>
+                              {match.team1.name} <span className="text-white">vs</span>{" "}
+                              {match.team2.name}
+                            </h2>
+                            <img
+                              src={match.team2.logo.asset.url}
+                              alt={match.team2.name}
+                              className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
+                            />
                           </div>
                         </div>
                       </div>
-                    )
-                  )}
+
+                      <div
+                        className="flex flex-col sm:flex-row justify-between items-start sm:items-end p-3 gap-3 sm:gap-0"
+                        style={{
+                          fontFamily: "DM Sans, sans-serif",
+                          fontWeight: 700,
+                        }}
+                      >
+                        <div className="text-left text-xs text-gray-700 font-semibold">
+                          <p className="text-sm text-gray-900">
+                            MATCH DAY {match.matchDay}
+                          </p>
+                          <p>{match.date}</p>
+                          <p>{match.time}</p>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                          <button
+                            className="flex items-center justify-center space-x-1 py-2 px-3 rounded-md text-white font-medium text-sm transition duration-300 w-full sm:w-auto"
+                            style={{
+                              backgroundColor: "#012752",
+                              border: "1px solid #012752",
+                            }}
+                          >
+                            <span>Get Ticket</span>
+                          </button>
+
+                          <button
+                            className="flex items-center justify-center space-x-1 py-2 px-3 rounded-md font-medium text-sm transition duration-300 w-full sm:w-auto"
+                            style={{
+                              backgroundColor: "white",
+                              color: "#012752",
+                              border: "1px solid #012752",
+                            }}
+                          >
+                            <span>Add to Calendar</span>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </section>
             )}
