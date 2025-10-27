@@ -157,7 +157,7 @@ export default function GamesPage() {
             {activeDivision === "Men" && (
               <section className="w-full bg-[#F7F7F7] py-6 sm:py-12">
                 <div className="space-y-8 max-w-7xl mx-auto px-2 sm:px-4">
-                  {["mengame1.png", "m2.png", "m2.png", "m2.png"].map(
+                  {["m2.png", "m2.png", "m2.png", "m2.png"].map(
                     (img, i) => (
                       <div
                         key={i}
