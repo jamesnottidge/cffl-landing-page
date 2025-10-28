@@ -195,25 +195,30 @@ export default function GamesPage() {
 
                         <div className="absolute inset-0 flex flex-col items-center justify-center text-center px-2 sm:px-4 z-10">
                           <div className="flex flex-col sm:flex-row items-center justify-center sm:space-x-4 space-y-2 sm:space-y-0">
-                            <img
-                              src={match.team1.logo.asset.url}
-                              alt={match.team1.name}
-                              className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
-                            />
-                            <h2
-                              className="text-lg sm:text-3xl md:text-4xl font-extrabold text-white uppercase drop-shadow-lg"
-                              style={{
-                                fontFamily: "ITC Machine Std, sans-serif",
-                              }}
-                            >
-                              {match.team1.name} <span className="text-white">vs</span>{" "}
-                              {match.team2.name}
-                            </h2>
-                            <img
-                              src={match.team2.logo.asset.url}
-                              alt={match.team2.name}
-                              className="w-10 h-10 sm:w-16 sm:h-16 object-contain"
-                            />
+                      <img
+  src={match.team1.logo.asset.url}
+  alt={match.team1.name}
+  className="team-logo"
+/>
+                         <h2
+  className="text-white uppercase drop-shadow-lg text-center"
+  style={{
+    fontFamily: "ITC Machine Std, sans-serif",
+    fontWeight: 700,
+    fontStyle: "normal",
+    fontSize: "70px",
+    lineHeight: "100%",
+    letterSpacing: "0%",
+  }}
+>
+  {match.team1.name} <span className="text-white">vs</span> {match.team2.name}
+</h2>
+
+                          <img
+  src={match.team2.logo.asset.url}
+  alt={match.team2.name}
+  className="team-logo"
+/>
                           </div>
                         </div>
                       </div>
@@ -229,8 +234,31 @@ export default function GamesPage() {
                           <p className="text-sm text-gray-900">
                             MATCH DAY {match.matchDay}
                           </p>
-                          <p>{match.date}</p>
-                          <p>{match.time}</p>
+                        <p
+  style={{
+    fontFamily: "DM Sans, sans-serif",
+    fontWeight: 700,
+    fontStyle: "normal",
+    fontSize: "18px",
+    lineHeight: "129%",
+    letterSpacing: "0%",
+  }}
+>
+  {match.date}
+</p>
+<p
+  style={{
+    fontFamily: "DM Sans, sans-serif",
+    fontWeight: 700,
+    fontStyle: "normal",
+    fontSize: "18px",
+    lineHeight: "129%",
+    letterSpacing: "0%",
+  }}
+>
+  {match.time}
+</p>
+
                         </div>
 
                         <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
